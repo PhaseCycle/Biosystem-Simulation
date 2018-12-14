@@ -21,22 +21,32 @@ class MacroEnvironment : public Environment {
 		vector<Animal*> animals;
 		vector<Plant*> plants;
 
-		//others
+		//Utility functions
+		//Independent
 		bool within_bounds(MacroOrganism &O);
-	
 		void spawn_animals(int num);
 		void spawn_plants(int num);
+
+		//Summarizing Functions ->  Made to make event() more readable
+			//Animal Actions
+		void animal_eat_move();
+		void animal_die();
+		void animal_reproduce();
+			//Plant Actions
+		void plant_reproduce();
 
 	public:
 		//constructors
 		MacroEnvironment();
 		MacroEnvironment(int t, double min_t, double max_t, double x, double y,int num_animals, int num_plants);
+
+		//getters
+		int animal_pop();
+		int plant_pop();
 		
 		//setters
 		void setBounds(double x, double y);
-		
-		int animal_pop();
-		int plant_pop();
 
+		//others
 		void event();
 };
