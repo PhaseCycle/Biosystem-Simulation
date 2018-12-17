@@ -195,6 +195,9 @@ void MacroEnvironment::animal_eat_move() {
 	int index;
 
 	for (int i = 0; i != animals.size(); i++) {
+		if (plants.empty()){
+		break;
+		}
 		dist_closest = *(animals[i]) - *(plants[0]);
 		closest = plants[0];
 		temp = closest;
@@ -227,6 +230,10 @@ void MacroEnvironment::animal_eat_move() {
 			} while ((x > x_max) || (x < -(x_max)) || (y > y_max) || (y < -(y_max)));
 			animals[i]->setLocation(x, y);
 		}
+		animals[i]->dec_con_time_counter();
+	}
+	
+	for (int i=0; i < animals.size(); i++){
 		animals[i]->dec_con_time_counter();
 	}
 
