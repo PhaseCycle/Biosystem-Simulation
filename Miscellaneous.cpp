@@ -14,3 +14,6 @@ double fRand(double fMin, double fMax) {
 	double f = (double)rand() / RAND_MAX;
 	return fMin + f * (fMax - fMin);
 }
+
+//Credit goes to https://stackoverflow.com/questions/13445688/how-to-generate-a-random-number-in-c
+//for showing how to implement this random number generator
