@@ -57,6 +57,20 @@ MicroEnvironment::MicroEnvironment(int t, double min_t, double max_t, double x, 
         spawn_fungi(num_fungus);
 }
 
+//deconstructors
+MicroEnvironment::~MicroEnvironment()
+{
+	for (int i = 0; i < fungi.size(); i++) {
+		delete (fungi[i]);
+	}
+	fungi.clear();
+
+	for (int j = 0; j < bacteria.size(); j++) {
+		delete (bacteria[j]);
+	}
+	bacteria.clear();
+}
+
 //getters
 int MicroEnvironment::bacteria_pop() {
         return bacteria.size();
@@ -112,18 +126,52 @@ void MicroEnvironment::event() {
         bacteria_move();
         fungus_eat_move();
         fungus_die();
+
+		set_bacteria_variables();
+		set_fungus_variables();
 		bacteria_reproduce();
         fungus_reproduce();
+
 		bacteria_age();
 		fungus_age();
 		time++;
 }
 void MicroEnvironment::print() {
-        cout << time << "\t" << bacteria_pop() << "\t" << fungus_pop() << endl;
+        cout << time << "\t" << fungus_pop() << "\t" << bacteria_pop() << endl;
 }
 
 //Utility functions
 //Independent
+double MicroEnvironment::fix_x_cord(double x_old) {
+
+	if (x_old > x_max)
+		return x_max;
+	else if (x_old < -(x_max))
+		return -(x_max);
+	else
+		return x_old;
+
+}
+double MicroEnvironment::fix_y_cord(double y_old) {
+
+	if (y_old > y_max)
+		return y_max;
+	else if (y_old < -(y_max))
+		return -(y_max);
+	else
+		return y_old;
+
+}
+double MicroEnvironment::fix_z_cord(double z_old) {
+
+	if (z_old > z_max)
+		return z_max;
+	else if (z_old < -(z_max))
+		return -(z_max);
+	else
+		return z_old;
+
+}
 bool MicroEnvironment::within_bounds(MicroOrganism &O) {
         double x_cord = O.getLocation().getX();
         double y_cord = O.getLocation().getY();
@@ -158,11 +206,15 @@ void MicroEnvironment::spawn_fungi(int num) {
 
 //Summarizing Functions ->  Made to make event() more readable
 //Fungus Actions
+
 void MicroEnvironment::fungus_eat_move() {
         Bacteria *closest, *temp;
         double dist_temp, dist_closest;
         int index;
-        for (int i = 0; i < fungi.size(); i++) {
+        for (unsigned int i = 0; i < fungi.size(); i++) {
+				if (fungi.empty()) {
+					break;
+				}
                 dist_closest = *(fungi[i]) - *(bacteria[0]);
                 closest = bacteria[0];
                 temp = closest;
@@ -187,16 +239,21 @@ void MicroEnvironment::fungus_eat_move() {
                         fungi[i]->setLocation(new_x, new_y, new_z);
                 }
                 else { //plant is not within visibility range (randomly moves around);
-                        double theta = fRand(0, 2 * 3.14159265);
-                        double phi = fRand(0, 2 * 3.14159265);
+					double theta, phi, new_x, new_y, new_z;
+					do {
+						theta = fRand(0, 2 * 3.14159265);
+						phi = fRand(0, 2 * 3.14159265);
 
-                        double new_x = fungi[i]->getLocation().getX() + fungi[i]->get_movement() * sin(phi) * cos(theta);
-                        double new_y = fungi[i]->getLocation().getY() + fungi[i]->get_movement() * sin(phi) * sin(theta);
-                        double new_z = fungi[i]->getLocation().getZ() + fungi[i]->get_movement() * cos(phi);
-
+						new_x = fungi[i]->getLocation().getX() + fungi[i]->get_movement() * sin(phi) * cos(theta);
+						new_y = fungi[i]->getLocation().getY() + fungi[i]->get_movement() * sin(phi) * sin(theta);
+						new_z = fungi[i]->getLocation().getZ() + fungi[i]->get_movement() * cos(phi);
+					} while ((new_x > x_max) || (new_x < -(x_max)) || (new_y > y_max) || (new_y < -(y_max)) || (new_z > z_max) || (new_z < -(z_max)));
                         fungi[i]->setLocation(new_x, new_y, new_z);
                 }
         }
+		for (unsigned int i = 0; i < fungi.size(); i++) {
+			fungi[i]->dec_con_time_counter();
+		}
 }
 void MicroEnvironment::fungus_die() {
         for (unsigned int i = 0; i < fungi.size();) { //techincally a proper declaration, see below
@@ -206,23 +263,33 @@ void MicroEnvironment::fungus_die() {
                         i++; //manual incrementation
                 }
                 else if (fungi[i]->get_con_time_counter() == 0) {
+						
                         fungi.erase(fungi.begin() + i);
                         //when animal is deleted, every element is shifted to fill the gap, so we want to reasses the same index
                 }
+				else {
+					i++; //if it's not time for a fungus to starve, we need to move on to check the next fungus
+				}
         }
 }
+void MicroEnvironment::set_fungus_variables() {
+	for (unsigned int i = 0; i < fungi.size(); i++) {
+		fungi[i]->set_temp(temp.func(time));
+	}
+}
 void MicroEnvironment::fungus_reproduce() {
-        int fu = fungi.size();
-        for (int i = 0; i < fu; i++) {
-                if (fungi[i]->get_rep_counter() == 0) {
-                        for (int j = 0; j < int(fungi[i]->get_rep_amount() * fungi[i]->get_fertility()); j++) {
-                                Fungus *f = new Fungus(0, 0, 0);
-                                fungi[i]->reproduce(f);
+	int fu = fungi.size();
+    for (int i = 0; i < fu; i++) {
+		if (fungi[i]->get_rep_counter() == 0) {
+			int constant_rep_amount = int(fungi[i]->get_rep_amount() * fungi[i]->get_fertility());
+				for (int j = 0; j < constant_rep_amount; j++) {
+								Fungus *f = new Fungus(0, 0, 0);
+                                fungi[i]->reproduce(f, x_max, y_max, z_max);
                                 fungi.push_back(f);
-                        }
                 }
+		}
                 fungi[i]->dec_rep_counter();
-        }
+	}
 }
 void MicroEnvironment::fungus_age() {
 	for (unsigned int i = 0; i < fungi.size(); i++) { //for loop is unsigned because vector index are undsigned
@@ -238,15 +305,22 @@ void MicroEnvironment::bacteria_move() {
                 double locY = bacteria[i]->getLocation().getY();
                 double locZ = bacteria[i]->getLocation().getZ();
                 double vis = bacteria[i]->get_visibility();
+				
+				double x_pos = fix_x_cord(locX + vis);
+				double x_neg = fix_x_cord(locX - vis);
+				double y_pos = fix_y_cord(locY + vis);
+				double y_neg = fix_y_cord(locY - vis);
+				double z_pos = fix_z_cord(locZ + vis);
+				double z_neg = fix_z_cord(locZ - vis);
 
                 //sample sunlight at cardinal directions
                 double s_at_self = get_sunlight(locX, locY, locZ);
-                double s_at_xpos = get_sunlight(locX + vis, locY, locZ);
-                double s_at_xneg = get_sunlight(locX - vis, locY, locZ);
-                double s_at_ypos = get_sunlight(locX, locY + vis, locZ);
-                double s_at_yneg = get_sunlight(locX, locY - vis, locZ);
-                double s_at_zpos = get_sunlight(locX, locY, locZ + vis);
-                double s_at_zneg = get_sunlight(locX, locY, locZ - vis);
+                double s_at_xpos = get_sunlight(x_pos, locY, locZ);
+                double s_at_xneg = get_sunlight(x_neg, locY, locZ);
+                double s_at_ypos = get_sunlight(locX, y_pos, locZ);
+                double s_at_yneg = get_sunlight(locX, y_neg, locZ);
+                double s_at_zpos = get_sunlight(locX, locY, z_pos);
+                double s_at_zneg = get_sunlight(locX, locY, z_neg);
                 double s_x_choose;
                 double s_y_choose;
                 double s_z_choose;
@@ -255,12 +329,12 @@ void MicroEnvironment::bacteria_move() {
 
                 //sample chemical at cardinal directions
                 double c_at_self = get_chemical(locX, locY, locZ);
-                double c_at_xpos = get_chemical(locX + vis, locY, locZ);
-                double c_at_xneg = get_chemical(locX - vis, locY, locZ);
-                double c_at_ypos = get_chemical(locX, locY + vis, locZ);
-                double c_at_yneg = get_chemical(locX, locY - vis, locZ);
-                double c_at_zpos = get_chemical(locX, locY, locZ + vis);
-                double c_at_zneg = get_chemical(locX, locY, locZ - vis);
+                double c_at_xpos = get_chemical(x_pos, locY, locZ);
+                double c_at_xneg = get_chemical(x_neg, locY, locZ);
+                double c_at_ypos = get_chemical(locX, y_pos, locZ);
+                double c_at_yneg = get_chemical(locX, y_neg, locZ);
+                double c_at_zpos = get_chemical(locX, locY, z_pos);
+                double c_at_zneg = get_chemical(locX, locY, z_neg);
                 double c_x_choose;
                 double c_y_choose;
                 double c_z_choose;
@@ -273,10 +347,10 @@ void MicroEnvironment::bacteria_move() {
                         //choosing x
                         if (s_at_xpos != s_at_xneg) {
                                 if (s_at_xpos > s_at_xneg) {
-                                        s_x_choose = locX + vis;
+                                        s_x_choose = x_pos;
                                 }
                                 else {
-                                        s_x_choose = locX - vis;
+                                        s_x_choose = x_neg;
                                 }
                         }
                         else {
@@ -286,10 +360,10 @@ void MicroEnvironment::bacteria_move() {
                         //choosing y
                         if (s_at_ypos != s_at_yneg) {
                                 if (s_at_ypos > s_at_yneg) {
-                                        s_y_choose = locY + vis;
+                                        s_y_choose = y_pos;
                                 }
                                 else {
-                                        s_y_choose = locY - vis;
+                                        s_y_choose = y_neg;
                                 }
                         }
                         else {
@@ -299,10 +373,10 @@ void MicroEnvironment::bacteria_move() {
                         //choosing z
                         if (s_at_zpos != s_at_zneg) {
                                 if (s_at_zpos > s_at_zneg) {
-                                        s_z_choose = locZ + vis;
+                                        s_z_choose = z_pos;
                                 }
                                 else {
-                                        s_z_choose = locZ - vis;
+                                        s_z_choose = z_neg;
                                 }
                         }
                         else {
@@ -313,10 +387,10 @@ void MicroEnvironment::bacteria_move() {
                 if (ifsimp == 1) {
                         if (c_at_xpos != c_at_xneg) {
                                 if (c_at_xpos > c_at_xneg) {
-                                        c_x_choose = locX + vis;
+                                        c_x_choose = x_pos;
                                 }
                                 else {
-                                        c_x_choose = locX - vis;
+                                        c_x_choose = x_neg;
                                 }
                         }
                         else {
@@ -326,10 +400,10 @@ void MicroEnvironment::bacteria_move() {
                         //choosing y
                         if (c_at_ypos != c_at_yneg) {
                                 if (c_at_ypos > c_at_yneg) {
-                                        c_y_choose = locY + vis;
+                                        c_y_choose = y_pos;
                                 }
                                 else {
-                                        c_y_choose = locY - vis;
+                                        c_y_choose = y_neg;
                                 }
                         }
                         else {
@@ -339,10 +413,10 @@ void MicroEnvironment::bacteria_move() {
                         //choosing z
                         if (c_at_zpos != c_at_zneg) {
                                 if (c_at_zpos > c_at_zneg) {
-                                        c_z_choose = locZ + vis;
+                                        c_z_choose = z_pos;
                                 }
                                 else {
-                                        c_z_choose = locZ - vis;
+                                        c_z_choose = z_neg;
                                 }
                         }
                         else {
@@ -373,40 +447,57 @@ void MicroEnvironment::bacteria_move() {
                                 bacteria[i]->setLocation(c_x_choose, c_y_choose, c_z_choose);
                         }
                         else {
-                                double theta = fRand(0, 2 * 3.14159265);
-                                double phi = fRand(0, 2 * 3.14159265);
+							double theta, phi, new_x, new_y, new_z;
+							do {
+								theta = fRand(0, 2 * 3.14159265);
+								phi = fRand(0, 2 * 3.14159265);
 
-                                double new_x = locX + bacteria[i]->get_movement() * sin(phi) * cos(theta);
-                                double new_y = locY + bacteria[i]->get_movement() * sin(phi) * sin(theta);
-                                double new_z = locZ + bacteria[i]->get_movement() * cos(phi);
+								new_x = locX + bacteria[i]->get_movement() * sin(phi) * cos(theta);
+								new_y = locY + bacteria[i]->get_movement() * sin(phi) * sin(theta);
+								new_z = locZ + bacteria[i]->get_movement() * cos(phi);
 
-                                bacteria[i]->setLocation(new_x, new_y, new_z);
-                        }
+								
+							} while ((new_x > x_max) || (new_x < -(x_max)) || (new_y > y_max) || (new_y < -(y_max)) || (new_z > z_max) || (new_z < -(z_max)));
+							bacteria[i]->setLocation(new_x, new_y, new_z);
+						}
                 }
                 else { //plant notices no change in chemical in cardinal directions at visibility range (randomly moves around);
-                        double theta = fRand(0, 2 * 3.14159265);
-                        double phi = fRand(0, 2 * 3.14159265);
+						double theta, phi, new_x, new_y, new_z;
+						do {
+								theta = fRand(0, 2 * 3.14159265);
+								phi = fRand(0, 2 * 3.14159265);
 
-                        double new_x = bacteria[i]->getLocation().getX() + bacteria[i]->get_movement() * sin(phi) * cos(theta);
-                        double new_y = bacteria[i]->getLocation().getY() + bacteria[i]->get_movement() * sin(phi) * sin(theta);
-                        double new_z = bacteria[i]->getLocation().getZ() + bacteria[i]->get_movement() * cos(phi);
-
-                        bacteria[i]->setLocation(new_x, new_y, new_z);
-                }
+								new_x = bacteria[i]->getLocation().getX() + bacteria[i]->get_movement() * sin(phi) * cos(theta);
+								new_y = bacteria[i]->getLocation().getY() + bacteria[i]->get_movement() * sin(phi) * sin(theta);
+								new_z = bacteria[i]->getLocation().getZ() + bacteria[i]->get_movement() * cos(phi);
+						} while ((new_x > x_max) || (new_x < -(x_max)) || (new_y > y_max) || (new_y < -(y_max)) || (new_z > z_max) || (new_z < -(z_max)));
+	
+						bacteria[i]->setLocation(new_x, new_y, new_z);
+				}
         }
 }
 //currently there is no natural death implemented from lack of sunlight or chemicals.
+void MicroEnvironment::set_bacteria_variables() {
+	for (unsigned int i = 0; i < bacteria.size(); i++) {
+		bacteria[i]->set_temp(temp.func(time));
+	}
+}
 void MicroEnvironment::bacteria_reproduce() {
         int ba = bacteria.size();
-        for (int i = 0; i < ba; i++) {
-                if (bacteria[i]->get_rep_counter() == 0) {
-                        for (int j = 0; j < int(bacteria[i]->get_rep_amount() * bacteria[i]->get_fertility()); j++) {
-                                Bacteria *b = new Bacteria(0, 0, 0);
-                                bacteria[i]->reproduce(b);
-                                bacteria.push_back(b);
-                        }
-                }
-                bacteria[i]->dec_rep_counter();
+		int fer;
+		if (ba > 0){
+			for (int i = 0; i < ba; i++) {
+				bacteria[i]->set_fertility();
+				if (bacteria[i]->get_rep_counter() == 0) {
+					fer = int(bacteria[i]->get_rep_amount() * bacteria[i]->get_fertility());
+					for (int j = 0; j < fer; j++) {
+						Bacteria *b = new Bacteria(0, 0, 0);
+						bacteria[i]->reproduce(b, x_max, y_max, z_max);
+						bacteria.push_back(b);
+					}
+				}
+				bacteria[i]->dec_rep_counter();
+			}
         }
 }
 void MicroEnvironment::bacteria_age() {
