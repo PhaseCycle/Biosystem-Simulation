@@ -25,7 +25,7 @@ int main() {
 	int cond, ani_pop, plant_pop, bact_pop, fung_pop, t;
 	double macEnv_x, macEnv_y, micEnv_x, micEnv_y;
 	double micEnv_z, min_t, max_t;
-	bool terminate = 1;
+	int terminate = 1;
 
 	Environment* sim = NULL;
 
@@ -91,12 +91,10 @@ int main() {
 			sim->print();
 		}
 
-		cout << "Do you want to run another simulation? (YES ---> 1)  (NO ---> 0) : ";
-		cin >> terminate;
-
-		while (terminate != 1 && terminate != 0) {
+		do {
 			cout << "Do you want to run another simulation? (YES ---> 1)  (NO ---> 0) : ";
 			cin >> terminate;
-		}
+		} while (terminate != 1 && terminate != 0);
+		cond = 0;
 	}
 }
