@@ -35,7 +35,7 @@ public:
 	void set_fertility(); //determines reproduction values as a function of temperature and sunlight
 
 	//other
-	void reproduce(Organism *O);
+	//void reproduce(Organism *O);
 	void reproduce(Plant *P, double x_max, double y_max);
 	void aged();
 };
