@@ -17,8 +17,8 @@ Purpose: Executes functions declared in Bacteria.h
 Bacteria::Bacteria(double x, double y, double z) {
 	consumption_amount = 0;
 	consumption_time = 0;
-	reproduction_amount = 5;
-	reproduction_time = 1;
+	reproduction_amount = 4;
+	reproduction_time = 3;
 	reproduction_counter = reproduction_time;
 	consumption_food_counter = consumption_amount;
 	consumption_time_counter = consumption_time;
@@ -44,7 +44,8 @@ void Bacteria::set_chemical(double x) {
 	chemical = x;
 }
 void Bacteria::set_fertility() {
-	fertility = 1 + ((2 * sunlight - 2 * chemical) / 3);
+	double temper = exp((-1/200) * pow((temperature - 75), 2));
+	fertility = (1 - temper) + (1 + sunlight) * (1 +chemical);
 }
 
 //other

@@ -66,7 +66,6 @@ MacroEnvironment::MacroEnvironment(int t, double min_t, double max_t, double x, 
 }
 
 //deconstructor
-
 MacroEnvironment::~MacroEnvironment()
 {
 	for (int i = 0; i < animals.size(); i++){
@@ -190,21 +189,17 @@ void MacroEnvironment::set_animal_variables() {
 		animals[i]->set_temp(temp.func(time));
 	}
 }
-
 void MacroEnvironment::animal_eat_move() {
 	Plant * closest, * temp;
 	double dist_temp, dist_closest;
 	int index;
 
-	for (unsigned int i = 0; i < animals.size(); i++) {
-		if (plants.empty()) {		
-			break;
-		}
+	for (int i = 0; i != animals.size(); i++) {
 		dist_closest = *(animals[i]) - *(plants[0]);
 		closest = plants[0];
 		temp = closest;
 		index = 0;
-		for (unsigned int j = 0; j < plants.size(); j++) {
+		for (int j = 0; j < plants.size(); j++) {
 			dist_temp = *(animals[i]) - *(plants[j]);
 			if (dist_temp < dist_closest) {
 				dist_closest = dist_temp;
@@ -214,6 +209,7 @@ void MacroEnvironment::animal_eat_move() {
 		}
 		if (dist_closest <= animals[i]->get_movement()) { //closest plant is within movement range
 			*(animals[i]) + closest;
+			delete closest;
 			plants.erase(plants.begin()+index);			//PLANT DELETED HERE
 		}
 		else if (dist_closest <= animals[i]->get_visibility()) { // closest plant is within visability range
@@ -231,8 +227,6 @@ void MacroEnvironment::animal_eat_move() {
 			} while ((x > x_max) || (x < -(x_max)) || (y > y_max) || (y < -(y_max)));
 			animals[i]->setLocation(x, y);
 		}
-	}
-	for (unsigned int i = 0; i < animals.size(); i++) {
 		animals[i]->dec_con_time_counter();
 	}
 
@@ -286,7 +280,7 @@ void MacroEnvironment::animal_die() {
 			i++; //manual incrementation
 		}
 		else if (animals[i]->get_con_time_counter() == 0) {
-			//delete animals[i];
+			delete animals[i];
 			animals.erase(animals.begin() + i);
 			//when animal is deleted, every element is shifted to fill the gap, so we want to reasses the same index
 		}

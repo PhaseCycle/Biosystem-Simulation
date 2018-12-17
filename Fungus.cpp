@@ -14,10 +14,10 @@ Purpose: Implementation of derived class for small fungi.
 #include <cmath>
 
 Fungus::Fungus(double x, double y, double z) {
-	consumption_amount = 0;
-	consumption_time = 0;
+	consumption_amount = 2;
+	consumption_time = 5;
 	reproduction_amount = 2;
-	reproduction_time = 2;
+	reproduction_time = 3;
 	reproduction_counter = reproduction_time;
 	consumption_food_counter = consumption_amount;
 	consumption_time_counter = consumption_time;
@@ -36,7 +36,7 @@ double Fungus::get_fertility() {
 
 //setters
 void Fungus::set_fertility() {
-	double temper = exp(-1 * pow((temperature - 50), 2));
+	double temper = exp((-1/200) * pow((temperature - 25), 2));
 	fertility = 2 * temper * (1 + temper);
 }
 

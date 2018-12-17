@@ -57,6 +57,20 @@ MicroEnvironment::MicroEnvironment(int t, double min_t, double max_t, double x, 
         spawn_fungi(num_fungus);
 }
 
+//deconstructors
+MicroEnvironment::~MicroEnvironment()
+{
+	for (int i = 0; i < fungi.size(); i++) {
+		delete (fungi[i]);
+	}
+	fungi.clear();
+
+	for (int j = 0; j < bacteria.size(); j++) {
+		delete (bacteria[j]);
+	}
+	bacteria.clear();
+}
+
 //getters
 int MicroEnvironment::bacteria_pop() {
         return bacteria.size();
@@ -112,8 +126,12 @@ void MicroEnvironment::event() {
         bacteria_move();
         fungus_eat_move();
         fungus_die();
+
+		set_bacteria_variables();
+		set_fungus_variables();
 		bacteria_reproduce();
         fungus_reproduce();
+
 		bacteria_age();
 		fungus_age();
 		time++;
@@ -124,6 +142,36 @@ void MicroEnvironment::print() {
 
 //Utility functions
 //Independent
+double MicroEnvironment::fix_x_cord(double x_old) {
+
+	if (x_old > x_max)
+		return x_max;
+	else if (x_old < -(x_max))
+		return -(x_max);
+	else
+		return x_old;
+
+}
+double MicroEnvironment::fix_y_cord(double y_old) {
+
+	if (y_old > y_max)
+		return y_max;
+	else if (y_old < -(y_max))
+		return -(y_max);
+	else
+		return y_old;
+
+}
+double MicroEnvironment::fix_z_cord(double z_old) {
+
+	if (z_old > z_max)
+		return z_max;
+	else if (z_old < -(z_max))
+		return -(z_max);
+	else
+		return z_old;
+
+}
 bool MicroEnvironment::within_bounds(MicroOrganism &O) {
         double x_cord = O.getLocation().getX();
         double y_cord = O.getLocation().getY();
@@ -158,6 +206,7 @@ void MicroEnvironment::spawn_fungi(int num) {
 
 //Summarizing Functions ->  Made to make event() more readable
 //Fungus Actions
+
 void MicroEnvironment::fungus_eat_move() {
         Bacteria *closest, *temp;
         double dist_temp, dist_closest;
@@ -196,6 +245,8 @@ void MicroEnvironment::fungus_eat_move() {
 
                         fungi[i]->setLocation(new_x, new_y, new_z);
                 }
+			
+				fungi[i]->dec_con_time_counter();
         }
 }
 void MicroEnvironment::fungus_die() {
@@ -206,10 +257,19 @@ void MicroEnvironment::fungus_die() {
                         i++; //manual incrementation
                 }
                 else if (fungi[i]->get_con_time_counter() == 0) {
+						
                         fungi.erase(fungi.begin() + i);
                         //when animal is deleted, every element is shifted to fill the gap, so we want to reasses the same index
                 }
+				else {
+					i++; //if it's not time for a fungus to starve, we need to move on to check the next fungus
+				}
         }
+}
+void MicroEnvironment::set_fungus_variables() {
+	for (unsigned int i = 0; i < fungi.size(); i++) {
+		fungi[i]->set_temp(temp.func(time));
+	}
 }
 void MicroEnvironment::fungus_reproduce() {
 	int fu = fungi.size();
@@ -397,6 +457,11 @@ void MicroEnvironment::bacteria_move() {
         }
 }
 //currently there is no natural death implemented from lack of sunlight or chemicals.
+void MicroEnvironment::set_bacteria_variables() {
+	for (unsigned int i = 0; i < bacteria.size(); i++) {
+		bacteria[i]->set_temp(temp.func(time));
+	}
+}
 void MicroEnvironment::bacteria_reproduce() {
         int ba = bacteria.size();
         for (int i = 0; i < ba; i++) {

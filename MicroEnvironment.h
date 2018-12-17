@@ -28,6 +28,9 @@ class MicroEnvironment : public Environment {
 
 		//Utility functions
 		//Independent
+		double fix_x_cord(double x_old);
+		double fix_y_cord(double y_old);
+		double fix_z_cord(double z_old);
 		bool within_bounds(MicroOrganism &O);
 		void spawn_bacteria(int num);
 		void spawn_fungi(int num);
@@ -36,11 +39,13 @@ class MicroEnvironment : public Environment {
 		//Fungus Actions
 		void fungus_eat_move();
 		void fungus_die();
+		void set_fungus_variables();
 		void fungus_reproduce();
 		void fungus_age();
 
 		//Bacteria Actions
 		void bacteria_move();
+		void set_bacteria_variables();
 		void bacteria_reproduce();
 		void bacteria_age();
 
@@ -48,6 +53,9 @@ class MicroEnvironment : public Environment {
 		//constructors
 		MicroEnvironment();
 		MicroEnvironment(int t, double min_t, double max_t, double x, double y, double z, int num_bacteria, int num_fungus);
+
+		//deconstructors
+		~MicroEnvironment();
 
 		//getters
 		int bacteria_pop();
