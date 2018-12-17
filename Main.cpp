@@ -81,7 +81,7 @@ int main() {
 		}
 
 		if (cond == 1) {
-			cout << "\nTime\t" << "Animal\t" << "Plant\t\n";
+			cout << "\nTime\t" << "Animal\t" << "Plant\t" << "O2\t" << "CO2\t\n";
 		}
 		if (cond == 2) {
 			cout << "\nTime\t" << "Fungus\t" << "Bacteria\t\n";
