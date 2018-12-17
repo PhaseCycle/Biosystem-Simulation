@@ -328,12 +328,16 @@ void MacroEnvironment::set_plant_variables() {
 }
 void MacroEnvironment::plant_reproduce() {
 	int pl = plants.size();
-	for (int i = 0; i < pl; i++) {
-		if (plants[i]->get_rep_counter() == 0) {
-			for (int j = 0; j < int(plants[i]->get_rep_amount() * plants[i]->get_fertility()); j++) {
-				Plant *p = new Plant(0,0);
-				plants[i]->reproduce(p);
-				plants.push_back(p);
+	int fer;
+	if (pl > 0){
+		for (int i = 0; i < pl; i++) {
+			if (plants[i]->get_rep_counter() == 0) {
+				fer = int(plants[i]->get_rep_amount() * plants[i]->get_fertility());
+				for (int j = 0; j < fer; j++) {
+					Plant *p = new Plant(0,0);
+					plants[i]->reproduce(p);
+					plants.push_back(p);
+				}
 			}
 		}
 		plants[i]->dec_rep_counter();
