@@ -13,20 +13,28 @@ Purpose: derived class for organisms in micro-enviornments
 #include "MicroOrganism.h"
 #include <cmath>
 
+//getters
 Point_3D MicroOrganism::getLocation() {
 	return l;
 }
+double MicroOrganism::get_temp() {
+	return temperature;
+}
 
+//setters
 void MicroOrganism::setLocation(double x_new, double y_new, double z_new){
 	l.setCoordinates(x_new, y_new, z_new);
 }
-
 void MicroOrganism::setLocation(Point_3D p) {
 	l.setCoordinates(p.getX(), p.getY(), p.getZ());
 }
+void MicroOrganism::set_temp(double t) {
+	temperature = t;
+}
 
-double MicroOrganism::operator-(MicroOrganism & O)
-{
+//Operator Overloading
+//(-) and associated methods
+double MicroOrganism::operator-(MicroOrganism & O){
 	double x, y, z, result;
 
 	x = delta_x(O);
@@ -36,7 +44,6 @@ double MicroOrganism::operator-(MicroOrganism & O)
 	result = sqrt(pow(x, 2.0) + pow(y, 2.0) + pow(z, 2.0));
 	return result;
 }
-
 double MicroOrganism::delta_x(MicroOrganism &O) {
 	return O.getLocation().getX() - l.getX();
 }
@@ -46,8 +53,6 @@ double MicroOrganism::delta_y(MicroOrganism &O) {
 double MicroOrganism::delta_z(MicroOrganism &O) {
 	return O.getLocation().getZ() - l.getZ();
 }
-
-
 double MicroOrganism::unit_x(MicroOrganism &O) {
 	return delta_x(O) / (*this - O);
 }

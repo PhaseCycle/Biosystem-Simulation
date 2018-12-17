@@ -16,8 +16,8 @@ Purpose: Implementation of derived class for small fungi.
 Fungus::Fungus(double x, double y, double z) {
 	consumption_amount = 0;
 	consumption_time = 0;
-	reproduction_amount = 5;
-	reproduction_time = 1;
+	reproduction_amount = 2;
+	reproduction_time = 2;
 	reproduction_counter = reproduction_time;
 	consumption_food_counter = consumption_amount;
 	consumption_time_counter = consumption_time;
@@ -25,7 +25,7 @@ Fungus::Fungus(double x, double y, double z) {
 	movement = 2;
 	spawn_distance = 4;
 	visibility = 1;
-
+	fertility = 2;
 	setLocation(x, y, z);
 }
 
@@ -33,19 +33,18 @@ Fungus::Fungus(double x, double y, double z) {
 double Fungus::get_fertility() {
 	return fertility;
 }
-//none needed
 
 //setters
 void Fungus::set_fertility() {
-	//gauss = exp(-1 * pow((temperature - 50), 2));
-	fertility = 2;
+	double temper = exp(-1 * pow((temperature - 50), 2));
+	fertility = 2 * temper * (1 + temper);
 }
 
 //other
 
 
 
-void Fungus::reproduce(Organism *O) {
+void Fungus::reproduce(Fungus *O) {
 	double theta = fRand(0, 2 * 3.14159265);
 	double phi = fRand(0, 2 * 3.14159265);
 
@@ -53,7 +52,7 @@ void Fungus::reproduce(Organism *O) {
 	double y = spawn_distance * cos(phi) * sin(theta);
 	double z = spawn_distance * sin(phi);
 
-	O = new Fungus(x, y, z);
+	O->setLocation(x, y, z);
 
 }
 void Fungus::aged() {
