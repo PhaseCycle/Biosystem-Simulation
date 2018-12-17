@@ -16,14 +16,17 @@ Purpose: derived class for organisms in micro-enviornments
 class MicroOrganism :public Organism {
 	protected:
 		Point_3D l;
+		double temperature;
 
 	public:
 		//getters
 		Point_3D getLocation();
+		double get_temp();
 
 		//setters
 		void setLocation(double x_new, double y_new, double z_new);
 		void setLocation(Point_3D p);
+		void set_temp(double t);
 
 		//Operator Overloading
 		//(-) and associated methods

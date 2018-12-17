@@ -44,6 +44,7 @@ void Fungus::set_fertility() {
 
 
 
+
 void Fungus::reproduce(Fungus *O, double x_max, double y_max, double z_max) {
 	
 	double theta, phi, x, y, z;
@@ -52,7 +53,8 @@ void Fungus::reproduce(Fungus *O, double x_max, double y_max, double z_max) {
 		theta = fRand(0, 2 * 3.14159265);
 		phi = fRand(0, 2 * 3.14159265);
 
-		x = spawn_distance * cos(phi) * cos(theta);
+
+    x = spawn_distance * cos(phi) * cos(theta);
 		y = spawn_distance * cos(phi) * sin(theta);
 		z = spawn_distance * sin(phi);
 	} while((x > x_max) || (x < -(x_max)) || (y > y_max) || (y < -(y_max)) || (z > z_max) || (z < -(z_max)));

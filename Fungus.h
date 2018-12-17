@@ -29,8 +29,10 @@ class Fungus:public MicroOrganism {
 		void set_fertility();
         
 		//others
+
 		void reproduce(Fungus *O, double x_max, double y_max, double z_max);
-        void aged();
+
+    void aged();
 		Fungus operator+(Bacteria *b);
 
 

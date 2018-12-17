@@ -250,6 +250,8 @@ void MicroEnvironment::fungus_eat_move() {
 					} while ((new_x > x_max) || (new_x < -(x_max)) || (new_y > y_max) || (new_y < -(y_max)) || (new_z > z_max) || (new_z < -(z_max)));
                         fungi[i]->setLocation(new_x, new_y, new_z);
                 }
+			
+				fungi[i]->dec_con_time_counter();
         }
 		for (unsigned int i = 0; i < fungi.size(); i++) {
 			fungi[i]->dec_con_time_counter();
@@ -284,8 +286,8 @@ void MicroEnvironment::fungus_reproduce() {
 			int constant_rep_amount = int(fungi[i]->get_rep_amount() * fungi[i]->get_fertility());
 				for (int j = 0; j < constant_rep_amount; j++) {
 								Fungus *f = new Fungus(0, 0, 0);
-                                fungi[i]->reproduce(f, x_max, y_max, z_max);
-                                fungi.push_back(f);
+                fungi[i]->reproduce(f, x_max, y_max, z_max);
+                fungi.push_back(f);
                 }
 		}
                 fungi[i]->dec_rep_counter();

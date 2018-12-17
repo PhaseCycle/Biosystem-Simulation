@@ -38,7 +38,6 @@ Animal::Animal(double x, double y) {
 double Animal::get_co2() {
 	return co2;
 }
-
 double Animal::get_fertility() {
 	return fertility;
 }
@@ -51,13 +50,16 @@ void Animal::set_co2(double x){
 	co2 = x;
 }
 void Animal::set_fertility() {
-	double temper = -(pow((temperature - 50), 2) / 500) + (temperature / 5);
-	double oxygen = -(pow(o2, 2) / 375) + (o2 / 5);
-	if (temper < 0)
-		temper = 0;
-	if (oxygen < 0)
-		oxygen = 0;
-	fertility = temper + oxygen;
+	//after having tried upside-down parabolas to unsucessfully model organisms having optimal fertility, we discovered the amazing gaussian curve!
+	//format , in this case: e^(-1/a * (x-d)^(2)), where a is the horizontal strech factor of the curve and d is the desired/optimal value where the function = 1
+	double temper = exp((-1 / 200) * pow((temperature - 50), 2));
+	double oxygen = exp((-1 / 10000) * pow((o2 - 300), 2));
+	if (o2 <= 0) {
+		fertility = 0;
+	}
+	else {
+		fertility = 1 + temper + oxygen;
+	}
 }
 
 //other
@@ -69,7 +71,6 @@ void Animal::reproduce(Organism *O) {
 
 		O = new Animal(x,y);	
 }
-
 void Animal::reproduce(Animal *A, double x_max, double y_max) {
 	double theta, x, y;
 	do {
@@ -79,7 +80,6 @@ void Animal::reproduce(Animal *A, double x_max, double y_max) {
 	} while ((x > x_max) || (x < -(x_max)) || (y > y_max) || (y < -(y_max)));
 	A->setLocation(x, y);
 }
-
 void Animal::aged() {
 	age++;
 	movement = movement - (age / 20); //decereases movement the older the cell is, although this is scaled by the constant 10. Accumulates
