@@ -209,7 +209,7 @@ void MacroEnvironment::animal_eat_move() {
 		}
 		if (dist_closest <= animals[i]->get_movement()) { //closest plant is within movement range
 			*(animals[i]) + closest;
-			delete closest;
+			//delete closest; was giving me errors
 			plants.erase(plants.begin()+index);			//PLANT DELETED HERE
 		}
 		else if (dist_closest <= animals[i]->get_visibility()) { // closest plant is within visability range
