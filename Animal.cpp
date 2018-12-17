@@ -63,14 +63,7 @@ void Animal::set_fertility() {
 }
 
 //other
-void Animal::reproduce(Organism *O) {
-		double theta = fRand(0, 2 * 3.14159265);
 
-		double x = round((l.getX() + spawn_distance * cos(theta)) * 10000) / 10000;
-		double y = round((l.getY() + spawn_distance * sin(theta)) * 10000) / 10000;
-
-		O = new Animal(x,y);	
-}
 void Animal::reproduce(Animal *A, double x_max, double y_max) {
 	double theta, x, y;
 	do {
