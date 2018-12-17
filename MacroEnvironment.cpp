@@ -339,8 +339,8 @@ void MacroEnvironment::plant_reproduce() {
 					plants.push_back(p);
 				}
 			}
+			plants[i]->dec_rep_counter();
 		}
-		plants[i]->dec_rep_counter();
 	}
 }
 void MacroEnvironment::plant_age() {
