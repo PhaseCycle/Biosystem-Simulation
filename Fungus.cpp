@@ -17,7 +17,7 @@ Fungus::Fungus(double x, double y, double z) {
 	consumption_amount = 2;
 	consumption_time = 5;
 	reproduction_amount = 2;
-	reproduction_time = 3;
+	reproduction_time = 4;
 	reproduction_counter = reproduction_time;
 	consumption_food_counter = consumption_amount;
 	consumption_time_counter = consumption_time;
@@ -44,14 +44,20 @@ void Fungus::set_fertility() {
 
 
 
-void Fungus::reproduce(Fungus *O) {
-	double theta = fRand(0, 2 * 3.14159265);
-	double phi = fRand(0, 2 * 3.14159265);
 
-	double x = spawn_distance * cos(phi) * cos(theta);
-	double y = spawn_distance * cos(phi) * sin(theta);
-	double z = spawn_distance * sin(phi);
+void Fungus::reproduce(Fungus *O, double x_max, double y_max, double z_max) {
+	
+	double theta, phi, x, y, z;
 
+	do {
+		theta = fRand(0, 2 * 3.14159265);
+		phi = fRand(0, 2 * 3.14159265);
+
+
+    x = spawn_distance * cos(phi) * cos(theta);
+		y = spawn_distance * cos(phi) * sin(theta);
+		z = spawn_distance * sin(phi);
+	} while((x > x_max) || (x < -(x_max)) || (y > y_max) || (y < -(y_max)) || (z > z_max) || (z < -(z_max)));
 	O->setLocation(x, y, z);
 
 }
