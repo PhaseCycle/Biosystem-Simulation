@@ -80,16 +80,7 @@ void Plant::reproduce(Plant *P,double x_max, double y_max) {
 		P->setLocation(x, y);
 	}
 }
-void Plant::reproduce(Organism *O) {
-	for (int i = 0; i <= int(reproduction_amount * fertility); i++) {
-		double theta = fRand(0, 2 * 3.14159265);
 
-		double x = round((l.getX() + spawn_distance * cos(theta)) * 10000) / 10000;
-		double y = round((l.getX() + spawn_distance * sin(theta)) * 10000) / 10000;
-
-		O = new Plant(x, y);
-	}
-}
 void Plant::aged() {
 	age++;
 	spawn_distance = 4 + (age / 100);//increases spawn distance as the cell gets older, scaled by the constant 100. Acculmulates
