@@ -26,8 +26,8 @@ MacroEnvironment::MacroEnvironment() {
 	Sinusoid a(amplitude, 10.0, 0.0, center);
 	temp = a;
 
-	co2 = 20;
-	o2 = 20;
+	co2 = 10;
+	o2 = 10;
 	Sinusoid binaryoscillator(0.5, 10, 0, 0.5);
 	sunlight = binaryoscillator;
 
@@ -51,8 +51,8 @@ MacroEnvironment::MacroEnvironment(int t, double min_t, double max_t, double x, 
 	Sinusoid a(amplitude, 10.0, 0.0, center);
 	temp = a;
 
-	co2 = num_animals + num_plants;
-	o2 = num_animals + num_plants;
+	co2 = 10;
+	o2 = 10;
 	Sinusoid binaryoscillator(0.5, 10, 0, 0.5);
 	sunlight = binaryoscillator;
 
@@ -158,16 +158,16 @@ double MacroEnvironment::fix_y_cord(double y_old) {
 void MacroEnvironment::spawn_animals(int num) {
 	double x, y;
 	for (int i = 0; i < num; i++) {
-		x = round(fRand(-(x_max), x_max)*10000)/10000;
-		y = round(fRand(-(y_max), y_max)*10000)/10000;
+		x = fRand(-(x_max), x_max);
+		y = fRand(-(y_max), y_max);
 		animals.push_back(new Animal(x, y));
 	}
 }
 void MacroEnvironment::spawn_plants(int num) {
 	double x, y;
 	for (int i = 0; i < num; i++) {
-		x = round(fRand(-(x_max), x_max) * 10000) / 10000;;
-		y = round(fRand(-(y_max), y_max) * 10000) / 10000;;
+		x = fRand(-(x_max), x_max);
+		y = fRand(-(y_max), y_max);
 		plants.push_back(new Plant(x, y));
 	}
 }
@@ -196,12 +196,15 @@ void MacroEnvironment::animal_eat_move() {
 	double dist_temp, dist_closest;
 	int index;
 
-	for (int i = 0; (i != animals.size() && !plants.empty()) ; i++) {
+	for (unsigned int i = 0; i < animals.size(); i++) {
+		if (plants.empty()) {		
+			break;
+		}
 		dist_closest = *(animals[i]) - *(plants[0]);
 		closest = plants[0];
 		temp = closest;
 		index = 0;
-		for (int j = 0; j < plants.size(); j++) {
+		for (unsigned int j = 0; j < plants.size(); j++) {
 			dist_temp = *(animals[i]) - *(plants[j]);
 			if (dist_temp < dist_closest) {
 				dist_closest = dist_temp;
@@ -211,12 +214,11 @@ void MacroEnvironment::animal_eat_move() {
 		}
 		if (dist_closest <= animals[i]->get_movement()) { //closest plant is within movement range
 			*(animals[i]) + closest;
-			delete closest;
 			plants.erase(plants.begin()+index);			//PLANT DELETED HERE
 		}
 		else if (dist_closest <= animals[i]->get_visibility()) { // closest plant is within visability range
-			double x = round((animals[i]->getLocation().getX() + animals[i]->get_movement() * animals[i]->unit_x(*closest))*10000)/10000;
-			double y = round((animals[i]->getLocation().getY() + animals[i]->get_movement() * animals[i]->unit_y(*closest))*10000)/10000;
+			double x = animals[i]->getLocation().getX() + animals[i]->get_movement() * animals[i]->unit_x(*closest);
+			double y = animals[i]->getLocation().getY() + animals[i]->get_movement() * animals[i]->unit_y(*closest);
 			animals[i]->setLocation(x,y);
 		}
 		else { //plant is not within visibility range (randomly moves around);
@@ -224,11 +226,13 @@ void MacroEnvironment::animal_eat_move() {
 
 			do {
 				theta = fRand(0, 2 * 3.14159265);
-				x = round((animals[i]->getLocation().getX() + animals[i]->get_movement() * cos(theta))*10000)/10000;
-				y = round((animals[i]->getLocation().getY() + animals[i]->get_movement() * sin(theta))*10000)/10000;
+				x = animals[i]->getLocation().getX() + animals[i]->get_movement() * cos(theta);
+				y = animals[i]->getLocation().getY() + animals[i]->get_movement() * sin(theta);
 			} while ((x > x_max) || (x < -(x_max)) || (y > y_max) || (y < -(y_max)));
 			animals[i]->setLocation(x, y);
 		}
+	}
+	for (unsigned int i = 0; i < animals.size(); i++) {
 		animals[i]->dec_con_time_counter();
 	}
 
@@ -242,9 +246,6 @@ void MacroEnvironment::animal_eat_move() {
 //	double dist_temp, dist_closest;
 ////	int index;
 //	for (i = animals.begin(); i != animals.end(); i++ ) {
-//		if (plants.empty());
-//			break;
-//
 //		dist_closest = *(*(i)) - *(*(plants.begin()));
 //		closest = plants.begin();
 //		for (j = plants.begin(); j != plants.end(); j++) {
@@ -285,7 +286,7 @@ void MacroEnvironment::animal_die() {
 			i++; //manual incrementation
 		}
 		else if (animals[i]->get_con_time_counter() == 0) {
-			delete animals[i];
+			//delete animals[i];
 			animals.erase(animals.begin() + i);
 			//when animal is deleted, every element is shifted to fill the gap, so we want to reasses the same index
 		}
