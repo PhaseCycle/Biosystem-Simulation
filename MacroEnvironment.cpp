@@ -342,7 +342,7 @@ void MacroEnvironment::plant_reproduce() {
 				fer = int(plants[i]->get_rep_amount() * plants[i]->get_fertility());
 				for (int j = 0; j < fer; j++) {
 					Plant *p = new Plant(0,0);
-					plants[i]->reproduce(p);
+					plants[i]->reproduce(p,x_max,y_max);
 					plants.push_back(p);
 				}
 			}
