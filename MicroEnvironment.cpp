@@ -212,7 +212,7 @@ void MicroEnvironment::fungus_eat_move() {
         double dist_temp, dist_closest;
         int index;
         for (unsigned int i = 0; i < fungi.size(); i++) {
-				if (fungi.empty()) {
+				if (bacteria.empty()) {
 					break;
 				}
                 dist_closest = *(fungi[i]) - *(bacteria[0]);
